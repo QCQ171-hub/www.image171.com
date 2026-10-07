@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片透明工具 - 魔棒 & 画笔</title>
+    <title>图片透明工具 - 选色 / 魔棒 / 画笔</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -14,213 +14,90 @@
             --text: #1e293b;
             --border: #e2e8f0;
         }
-
         * { box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            background: var(--bg); color: var(--text);
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-
         h1 { margin-bottom: 16px; font-size: 1.5rem; }
-
         .container {
-            background: var(--panel);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            max-width: 960px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            background: var(--panel); padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
+            max-width: 960px; width: 100%;
+            display: flex; flex-direction: column; gap: 12px;
         }
-
-        /* ---- 顶部文件栏 ---- */
         .top-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+            padding-bottom: 12px; border-bottom: 1px solid var(--border);
         }
-
         .top-bar input[type="file"] { flex: 1; min-width: 160px; }
-
-        /* ---- 工具栏 ---- */
         .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+            padding-bottom: 12px; border-bottom: 1px solid var(--border);
         }
-
-        /* 模式切换 */
-        .mode-tabs {
-            display: flex;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid var(--primary);
-        }
-
+        /* 三模式 Tab */
+        .mode-tabs { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--primary); }
         .mode-tabs button {
-            border-radius: 0;
-            background: #fff;
-            color: var(--primary);
-            border: none;
-            padding: 6px 14px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.85rem;
-            transition: all 0.15s;
+            border-radius: 0; background: #fff; color: var(--primary); border: none;
+            padding: 6px 12px; cursor: pointer; font-weight: 500; font-size: .85rem; transition: all .15s;
         }
-
-        .mode-tabs button.active {
-            background: var(--primary);
-            color: #fff;
-        }
-
+        .mode-tabs button.active { background: var(--primary); color: #fff; }
         /* 动作切换 */
-        .action-toggle {
-            display: flex;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
+        .action-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
         .action-toggle button {
-            border-radius: 0;
-            background: #fff;
-            color: var(--text);
-            border: none;
-            padding: 6px 14px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.85rem;
-            transition: all 0.15s;
+            border-radius: 0; background: #fff; color: var(--text); border: none;
+            padding: 6px 12px; cursor: pointer; font-weight: 500; font-size: .85rem; transition: all .15s;
         }
-
-        .action-toggle button.erase-active {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .action-toggle button.restore-active {
-            background: var(--success);
-            color: #fff;
-        }
-
-        /* 滑块组 */
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-        }
-
-        .slider-group input[type="range"] {
-            width: 100px;
-            cursor: pointer;
-        }
-
-        .slider-group .val {
-            min-width: 28px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
-
+        .action-toggle button.erase-active  { background: var(--danger);  color: #fff; }
+        .action-toggle button.restore-active{ background: var(--success); color: #fff; }
+        /* 滑块 */
+        .slider-group { display: flex; align-items: center; gap: 6px; font-size: .85rem; }
+        .slider-group input[type="range"] { width: 100px; cursor: pointer; }
+        .slider-group .val { min-width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
         /* 按钮 */
         .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.85rem;
-            transition: opacity 0.2s;
+            background: var(--primary); color: #fff; border: none;
+            padding: 7px 14px; border-radius: 6px; cursor: pointer;
+            font-weight: 500; font-size: .85rem; transition: opacity .2s;
         }
-
-        .btn:hover { opacity: 0.85; }
-        .btn:disabled { background-color: #cbd5e1; cursor: not-allowed; }
-
-        .btn-outline {
-            background: #fff;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-
+        .btn:hover { opacity: .85; }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
         .btn-outline:hover { background: #eff6ff; }
-
-        /* ---- 画布 ---- */
+        /* 画布 */
         .canvas-wrapper {
-            position: relative;
-            overflow: auto;
-            max-height: 70vh;
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
+            position: relative; overflow: auto; max-height: 70vh;
+            border: 2px dashed #cbd5e1; border-radius: 8px;
             background-image:
-                linear-gradient(45deg, #eee 25%, transparent 25%),
-                linear-gradient(-45deg, #eee 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, #eee 75%),
-                linear-gradient(-45deg, transparent 75%, #eee 75%);
+                linear-gradient(45deg,#eee 25%,transparent 25%),
+                linear-gradient(-45deg,#eee 25%,transparent 25%),
+                linear-gradient(45deg,transparent 75%,#eee 75%),
+                linear-gradient(-45deg,transparent 75%,#eee 75%);
             background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 300px;
+            background-position: 0 0,0 10px,10px -10px,-10px 0;
+            display: flex; justify-content: center; align-items: center; min-height: 300px;
         }
-
-        canvas {
-            display: block;
-            max-width: 100%;
-        }
-
-        /* ---- 状态栏 ---- */
+        canvas { display: block; max-width: 100%; }
         .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: #64748b;
-            flex-wrap: wrap;
-            gap: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: .85rem; color: #64748b; flex-wrap: wrap; gap: 8px;
         }
-
-        .right-actions {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
+        .color-info { display: flex; align-items: center; gap: 6px; }
+        .color-swatch {
+            width: 20px; height: 20px; border-radius: 4px;
+            border: 1px solid #ccc; display: inline-block;
         }
-
         .hidden { display: none !important; }
-
-        /* 笔刷预览光标提示 */
-        .brush-info {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
     </style>
 </head>
 <body>
 
-<h1>🎨 图片透明工具 — 魔棒 & 画笔</h1>
+<h1>🎨 图片透明工具 — 选色 / 魔棒 / 画笔</h1>
 
 <div class="container">
-
-    <!-- 顶部：文件 + 下载 -->
+    <!-- 顶栏 -->
     <div class="top-bar">
         <input type="file" id="fileInput" accept="image/*">
         <button class="btn btn-outline" id="resetBtn" disabled>↩ 重置</button>
@@ -229,20 +106,28 @@
 
     <!-- 工具栏 -->
     <div class="toolbar">
-        <!-- 模式 -->
+        <!-- 三模式 -->
         <div class="mode-tabs">
-            <button id="modeWand" class="active" title="魔棒选取">🪄 魔棒</button>
+            <button id="modePick" class="active" title="点选颜色全局替换">🎯 选色</button>
+            <button id="modeWand" title="魔棒区域选取">🪄 魔棒</button>
             <button id="modeBrush" title="画笔擦除/恢复">🖌 画笔</button>
         </div>
 
-        <!-- 动作 -->
-        <div class="action-toggle">
+        <!-- 擦除/恢复（仅魔棒&画笔可用） -->
+        <div class="action-toggle" id="actionToggle">
             <button id="actionErase" class="erase-active">✕ 擦除</button>
             <button id="actionRestore">✓ 恢复</button>
         </div>
 
+        <!-- 选色阈值 -->
+        <div class="slider-group" id="pickGroup">
+            <label>选色阈值:</label>
+            <input type="range" id="pickThreshold" min="0" max="255" value="0">
+            <span class="val" id="pickThresholdVal">0</span>
+        </div>
+
         <!-- 魔棒阈值 -->
-        <div class="slider-group" id="wandGroup">
+        <div class="slider-group hidden" id="wandGroup">
             <label>魔棒阈值:</label>
             <input type="range" id="wandThreshold" min="0" max="255" value="32">
             <span class="val" id="wandThresholdVal">32</span>
@@ -253,13 +138,17 @@
             <label>笔刷大小:</label>
             <input type="range" id="brushSize" min="1" max="150" value="20">
             <span class="val" id="brushSizeVal">20</span>
-            <span class="brush-info">px</span>
+            <span style="font-size:.8rem;color:#94a3b8">px</span>
         </div>
     </div>
 
     <!-- 状态栏 -->
     <div class="status-bar">
         <span id="statusText">请上传图片…</span>
+        <div id="pickedColorInfo" class="color-info hidden">
+            选中: <span id="pickedHex">#------</span>
+            <span id="pickedSwatch" class="color-swatch"></span>
+        </div>
     </div>
 
     <!-- 画布 -->
@@ -269,36 +158,45 @@
 </div>
 
 <script>
-// ============ DOM ============
-const fileInput      = document.getElementById('fileInput');
-const canvas         = document.getElementById('canvas');
-const ctx            = canvas.getContext('2d', { willReadFrequently: true });
-const canvasWrapper  = document.getElementById('canvasWrapper');
-const resetBtn       = document.getElementById('resetBtn');
-const downloadBtn    = document.getElementById('downloadBtn');
-const statusText     = document.getElementById('statusText');
+// ========== DOM ==========
+const fileInput       = document.getElementById('fileInput');
+const canvas          = document.getElementById('canvas');
+const ctx             = canvas.getContext('2d', { willReadFrequently: true });
+const canvasWrapper   = document.getElementById('canvasWrapper');
+const resetBtn        = document.getElementById('resetBtn');
+const downloadBtn     = document.getElementById('downloadBtn');
+const statusText      = document.getElementById('statusText');
+const pickedColorInfo = document.getElementById('pickedColorInfo');
+const pickedHex       = document.getElementById('pickedHex');
+const pickedSwatch    = document.getElementById('pickedSwatch');
 
-const modeWandBtn    = document.getElementById('modeWand');
-const modeBrushBtn   = document.getElementById('modeBrush');
-const actionEraseBtn = document.getElementById('actionErase');
+const modePickBtn  = document.getElementById('modePick');
+const modeWandBtn  = document.getElementById('modeWand');
+const modeBrushBtn = document.getElementById('modeBrush');
+const actionToggle = document.getElementById('actionToggle');
+const actionEraseBtn   = document.getElementById('actionErase');
 const actionRestoreBtn = document.getElementById('actionRestore');
 
-const wandGroup        = document.getElementById('wandGroup');
-const wandThreshold    = document.getElementById('wandThreshold');
-const wandThresholdVal = document.getElementById('wandThresholdVal');
+const pickGroup         = document.getElementById('pickGroup');
+const pickThreshold     = document.getElementById('pickThreshold');
+const pickThresholdVal  = document.getElementById('pickThresholdVal');
+
+const wandGroup         = document.getElementById('wandGroup');
+const wandThreshold     = document.getElementById('wandThreshold');
+const wandThresholdVal  = document.getElementById('wandThresholdVal');
 
 const brushGroup     = document.getElementById('brushGroup');
 const brushSize      = document.getElementById('brushSize');
 const brushSizeVal   = document.getElementById('brushSizeVal');
 
-// ============ 状态 ============
-let originalImageData = null; // ImageData 原始快照
-let currentMode  = 'wand';   // 'wand' | 'brush'
+// ========== 状态 ==========
+let originalImageData = null;
+let currentMode   = 'pick';  // 'pick' | 'wand' | 'brush'
 let currentAction = 'erase'; // 'erase' | 'restore'
-let isPainting   = false;
-let lastBrushPos = null;
+let isPainting    = false;
+let lastBrushPos  = null;
 
-// ============ 1. 加载图片 ============
+// ========== 1. 加载图片 ==========
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -309,46 +207,53 @@ fileInput.addEventListener('change', (e) => {
             canvas.width  = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-            // 保存原始像素快照
             originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            resetBtn.disabled   = false;
+            resetBtn.disabled    = false;
             downloadBtn.disabled = false;
-            setStatus('图片已加载。选择模式后在画布上操作。');
+            pickedColorInfo.classList.add('hidden');
+            setStatus('图片已加载。当前为【选色模式】，点击图片选取要变透明的颜色。');
         };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
 });
 
-// ============ 2. 模式切换 ============
-modeWandBtn.addEventListener('click', () => {
-    currentMode = 'wand';
-    modeWandBtn.classList.add('active');
-    modeBrushBtn.classList.remove('active');
-    wandGroup.classList.remove('hidden');
-    brushGroup.classList.add('hidden');
-    canvas.style.cursor = 'crosshair';
-    setStatus('魔棒模式：点击图片上的区域进行选取。');
-});
+// ========== 2. 模式切换 ==========
+function setMode(mode) {
+    currentMode = mode;
+    modePickBtn.classList.toggle('active',  mode === 'pick');
+    modeWandBtn.classList.toggle('active',  mode === 'wand');
+    modeBrushBtn.classList.toggle('active', mode === 'brush');
 
-modeBrushBtn.addEventListener('click', () => {
-    currentMode = 'brush';
-    modeBrushBtn.classList.add('active');
-    modeWandBtn.classList.remove('active');
-    brushGroup.classList.remove('hidden');
-    wandGroup.classList.add('hidden');
-    canvas.style.cursor = 'none'; // 自定义光标
-    setStatus('画笔模式：按住鼠标涂抹。');
-});
+    pickGroup.classList.toggle('hidden',  mode !== 'pick');
+    wandGroup.classList.toggle('hidden',  mode !== 'wand');
+    brushGroup.classList.toggle('hidden', mode !== 'brush');
 
-// ============ 3. 动作切换 ============
+    // 选色模式不需要擦除/恢复切换
+    actionToggle.classList.toggle('hidden', mode === 'pick');
+
+    canvas.style.cursor = mode === 'brush' ? 'none' : 'crosshair';
+    hideBrushCursor();
+
+    const hints = {
+        pick:  '选色模式：点击图片选取颜色，拖动阈值调整容差。',
+        wand:  '魔棒模式：点击区域进行连通选取。',
+        brush: '画笔模式：按住鼠标涂抹擦除或恢复。'
+    };
+    setStatus(hints[mode]);
+}
+
+modePickBtn.addEventListener('click',  () => setMode('pick'));
+modeWandBtn.addEventListener('click',  () => setMode('wand'));
+modeBrushBtn.addEventListener('click', () => setMode('brush'));
+
+// ========== 3. 动作切换 ==========
 actionEraseBtn.addEventListener('click', () => {
     currentAction = 'erase';
     actionEraseBtn.classList.add('erase-active');
     actionRestoreBtn.classList.remove('restore-active');
     setStatus(`当前动作：擦除（变透明）`);
 });
-
 actionRestoreBtn.addEventListener('click', () => {
     currentAction = 'restore';
     actionRestoreBtn.classList.add('restore-active');
@@ -356,30 +261,85 @@ actionRestoreBtn.addEventListener('click', () => {
     setStatus(`当前动作：恢复（还原像素）`);
 });
 
-// ============ 4. 滑块 ============
-wandThreshold.addEventListener('input', (e) => {
-    wandThresholdVal.textContent = e.target.value;
+// ========== 4. 滑块 ==========
+pickThreshold.addEventListener('input', (e) => {
+    pickThresholdVal.textContent = e.target.value;
+    // 选色模式下实时预览
+    if (currentMode === 'pick' && originalImageData && lastPickedColor) {
+        clearTimeout(window._pickDebounce);
+        window._pickDebounce = setTimeout(() => applyPickColor(lastPickedColor), 30);
+    }
 });
+wandThreshold.addEventListener('input', (e) => { wandThresholdVal.textContent = e.target.value; });
+brushSize.addEventListener('input',     (e) => { brushSizeVal.textContent = e.target.value; });
 
-brushSize.addEventListener('input', (e) => {
-    brushSizeVal.textContent = e.target.value;
-});
-
-// ============ 5. 画布坐标转换 ============
+// ========== 5. 坐标转换 ==========
 function canvasCoords(e) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
     return {
-        x: Math.floor((e.clientX - rect.left) * scaleX),
-        y: Math.floor((e.clientY - rect.top)  * scaleY)
+        x: Math.floor((e.clientX - rect.left) * (canvas.width  / rect.width)),
+        y: Math.floor((e.clientY - rect.top)  * (canvas.height / rect.height))
     };
 }
 
-// ============ 6. 魔棒（区域生长 Flood Fill）============
+// ================================================================
+//  🎯 选色模式：点选颜色 → 全局匹配替换透明
+// ================================================================
+let lastPickedColor = null; // {r,g,b}
+
 canvas.addEventListener('click', (e) => {
     if (!originalImageData) return;
-    if (currentMode !== 'wand') return;
+    if (currentMode !== 'pick') return;
+
+    const { x, y } = canvasCoords(e);
+    const w = canvas.width, h = canvas.height;
+    if (x < 0 || y < 0 || x >= w || y >= h) return;
+
+    // 从原始数据取色（避免已被透明的像素干扰）
+    const origData = originalImageData.data;
+    const idx = (y * w + x) * 4;
+    lastPickedColor = { r: origData[idx], g: origData[idx+1], b: origData[idx+2] };
+
+    // 更新 UI
+    const hex = rgbToHex(lastPickedColor.r, lastPickedColor.g, lastPickedColor.b);
+    pickedHex.textContent = hex;
+    pickedSwatch.style.backgroundColor = hex;
+    pickedColorInfo.classList.remove('hidden');
+
+    applyPickColor(lastPickedColor);
+});
+
+/**
+ * 核心：遍历全部像素，与目标颜色三通道差值均 ≤ 阈值 → 变透明
+ * 始终基于 originalImageData 计算，保证可反复调整阈值
+ */
+function applyPickColor(color) {
+    if (!originalImageData || !color) return;
+    const threshold = parseInt(pickThreshold.value);
+    const w = canvas.width, h = canvas.height;
+
+    // 先还原原图再处理（这样阈值调小也能正确恢复）
+    const imageData = ctx.createImageData(w, h);
+    imageData.data.set(originalImageData.data);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const dr = Math.abs(data[i]   - color.r);
+        const dg = Math.abs(data[i+1] - color.g);
+        const db = Math.abs(data[i+2] - color.b);
+        if (dr <= threshold && dg <= threshold && db <= threshold) {
+            data[i+3] = 0;
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+    setStatus(`选色处理完成（阈值 ${threshold}）。可继续点选其他颜色或调整阈值。`);
+}
+
+// ================================================================
+//  🪄 魔棒模式：BFS 区域生长
+// ================================================================
+canvas.addEventListener('click', (e) => {
+    if (!originalImageData || currentMode !== 'wand') return;
 
     const { x, y } = canvasCoords(e);
     const w = canvas.width, h = canvas.height;
@@ -387,95 +347,69 @@ canvas.addEventListener('click', (e) => {
 
     const threshold = parseInt(wandThreshold.value);
     const imageData = ctx.getImageData(0, 0, w, h);
-    const data = imageData.data;
+    const data     = imageData.data;
     const origData = originalImageData.data;
-
-    const visited = new Uint8Array(w * h); // 0 = 未访问
-    const queue = [x, y]; // 扁平队列 [x0,y0,x1,y1,...]
+    const visited  = new Uint8Array(w * h);
+    const queue    = [x, y];
     visited[y * w + x] = 1;
-
     const erase = currentAction === 'erase';
 
-    // BFS 区域生长：比较相邻像素间颜色距离
     while (queue.length > 0) {
         const cy = queue.pop();
         const cx = queue.pop();
         const ci = (cy * w + cx) * 4;
 
-        // 对当前像素执行动作
         if (erase) {
             data[ci + 3] = 0;
         } else {
-            // 恢复：从原始数据恢复 RGBA
             data[ci]     = origData[ci];
             data[ci + 1] = origData[ci + 1];
             data[ci + 2] = origData[ci + 2];
             data[ci + 3] = origData[ci + 3];
         }
 
-        // 当前像素颜色（用原始数据做比较，避免已修改像素干扰）
-        const cr = origData[ci];
-        const cg = origData[ci + 1];
-        const cb = origData[ci + 2];
-
-        // 4-邻域
-        const neighbors = [
-            [cx - 1, cy], [cx + 1, cy],
-            [cx, cy - 1], [cx, cy + 1]
-        ];
-
+        const cr = origData[ci], cg = origData[ci+1], cb = origData[ci+2];
+        const neighbors = [[cx-1,cy],[cx+1,cy],[cx,cy-1],[cx,cy+1]];
         for (const [nx, ny] of neighbors) {
             if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
             const ni = ny * w + nx;
             if (visited[ni]) continue;
-
             const pi = ni * 4;
-            const nr = origData[pi];
-            const ng = origData[pi + 1];
-            const nb = origData[pi + 2];
-
-            // 颜色距离（欧几里得）
             const dist = Math.sqrt(
-                (cr - nr) ** 2 +
-                (cg - ng) ** 2 +
-                (cb - nb) ** 2
+                (cr - origData[pi])**2 +
+                (cg - origData[pi+1])**2 +
+                (cb - origData[pi+2])**2
             );
-
             if (dist <= threshold) {
                 visited[ni] = 1;
                 queue.push(nx, ny);
             }
         }
     }
-
     ctx.putImageData(imageData, 0, 0);
-    setStatus(`魔棒${erase ? '擦除' : '恢复'}完成（阈值 ${threshold}）。`);
+    setStatus(`魔棒${erase?'擦除':'恢复'}完成（阈值 ${threshold}）。`);
 });
 
-// ============ 7. 画笔（mousedown / mousemove / mouseup）============
+// ================================================================
+//  🖌 画笔模式
+// ================================================================
 canvas.addEventListener('mousedown', (e) => {
     if (!originalImageData || currentMode !== 'brush') return;
     isPainting = true;
     lastBrushPos = canvasCoords(e);
     paintStroke(lastBrushPos, lastBrushPos);
 });
-
 canvas.addEventListener('mousemove', (e) => {
     if (!originalImageData || currentMode !== 'brush') return;
-
-    // 自定义光标跟随
     drawBrushCursor(e);
-
     if (!isPainting) return;
     const pos = canvasCoords(e);
     paintStroke(lastBrushPos, pos);
     lastBrushPos = pos;
 });
-
-canvas.addEventListener('mouseup',   () => { isPainting = false; lastBrushPos = null; });
+canvas.addEventListener('mouseup',    () => { isPainting = false; lastBrushPos = null; });
 canvas.addEventListener('mouseleave', () => { isPainting = false; lastBrushPos = null; hideBrushCursor(); });
 
-// ---- 画笔绘制 ----
 function paintStroke(from, to) {
     const w = canvas.width, h = canvas.height;
     const radius = parseInt(brushSize.value) / 2;
@@ -484,44 +418,35 @@ function paintStroke(from, to) {
     const data     = imageData.data;
     const origData = originalImageData.data;
 
-    // 沿 from→to 插值，保证连续涂抹无断点
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
+    const dx = to.x - from.x, dy = to.y - from.y;
     const steps = Math.max(Math.abs(dx), Math.abs(dy), 1);
-
     for (let s = 0; s <= steps; s++) {
         const t  = steps === 0 ? 0 : s / steps;
         const cx = Math.round(from.x + dx * t);
         const cy = Math.round(from.y + dy * t);
-
-        // 在 (cx,cy) 画一个圆形区域
         const x0 = Math.max(0, Math.floor(cx - radius));
-        const x1 = Math.min(w - 1, Math.ceil(cx + radius));
+        const x1 = Math.min(w-1, Math.ceil(cx + radius));
         const y0 = Math.max(0, Math.floor(cy - radius));
-        const y1 = Math.min(h - 1, Math.ceil(cy + radius));
+        const y1 = Math.min(h-1, Math.ceil(cy + radius));
         const r2 = radius * radius;
-
         for (let py = y0; py <= y1; py++) {
             for (let px = x0; px <= x1; px++) {
-                const distSq = (px - cx) ** 2 + (py - cy) ** 2;
-                if (distSq > r2) continue;
+                if ((px-cx)**2 + (py-cy)**2 > r2) continue;
                 const i = (py * w + px) * 4;
-                if (erase) {
-                    data[i + 3] = 0;
-                } else {
-                    data[i]     = origData[i];
-                    data[i + 1] = origData[i + 1];
-                    data[i + 2] = origData[i + 2];
-                    data[i + 3] = origData[i + 3];
+                if (erase) { data[i+3] = 0; }
+                else {
+                    data[i]   = origData[i];
+                    data[i+1] = origData[i+1];
+                    data[i+2] = origData[i+2];
+                    data[i+3] = origData[i+3];
                 }
             }
         }
     }
-
     ctx.putImageData(imageData, 0, 0);
 }
 
-// ---- 自定义画笔光标（覆盖层 Canvas）----
+// ---- 画笔光标 ----
 let cursorCanvas = null;
 function ensureCursorCanvas() {
     if (!cursorCanvas) {
@@ -531,61 +456,55 @@ function ensureCursorCanvas() {
         canvasWrapper.appendChild(cursorCanvas);
     }
 }
-
 function drawBrushCursor(e) {
     ensureCursorCanvas();
     const rect = canvas.getBoundingClientRect();
     const size = parseInt(brushSize.value);
     const displayScale = rect.width / canvas.width;
     const displaySize = Math.max(size * displayScale, 4);
-
     cursorCanvas.width  = displaySize + 4;
     cursorCanvas.height = displaySize + 4;
     cursorCanvas.style.width  = cursorCanvas.width + 'px';
     cursorCanvas.style.height = cursorCanvas.height + 'px';
-    cursorCanvas.style.left   = (e.clientX - rect.left + canvasWrapper.scrollLeft - cursorCanvas.width / 2) + 'px';
-    cursorCanvas.style.top    = (e.clientY - rect.top  + canvasWrapper.scrollTop  - cursorCanvas.height / 2) + 'px';
-
+    cursorCanvas.style.left   = (e.clientX - rect.left + canvasWrapper.scrollLeft - cursorCanvas.width/2) + 'px';
+    cursorCanvas.style.top    = (e.clientY - rect.top  + canvasWrapper.scrollTop  - cursorCanvas.height/2) + 'px';
     const cctx = cursorCanvas.getContext('2d');
     cctx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
     cctx.strokeStyle = currentAction === 'erase' ? '#ef4444' : '#22c55e';
     cctx.lineWidth = 1.5;
     cctx.beginPath();
-    cctx.arc(cursorCanvas.width / 2, cursorCanvas.height / 2, displaySize / 2, 0, Math.PI * 2);
+    cctx.arc(cursorCanvas.width/2, cursorCanvas.height/2, displaySize/2, 0, Math.PI*2);
     cctx.stroke();
 }
-
 function hideBrushCursor() {
-    if (cursorCanvas) {
-        const cctx = cursorCanvas.getContext('2d');
-        cctx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
-    }
+    if (cursorCanvas) cursorCanvas.getContext('2d').clearRect(0,0,cursorCanvas.width,cursorCanvas.height);
 }
 
-// ============ 8. 重置 ============
+// ========== 重置 & 下载 ==========
 resetBtn.addEventListener('click', () => {
     if (!originalImageData) return;
     ctx.putImageData(originalImageData, 0, 0);
+    lastPickedColor = null;
+    pickedColorInfo.classList.add('hidden');
     setStatus('已重置为原始图片。');
 });
 
-// ============ 9. 下载 ============
 downloadBtn.addEventListener('click', () => {
     if (!originalImageData) return;
-    const link = document.createElement('a');
-    link.download = 'transparent_output.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const a = document.createElement('a');
+    a.download = 'transparent_output.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
 });
 
-// ============ 工具 ============
-function setStatus(msg) {
-    statusText.textContent = msg;
+// ========== 工具 ==========
+function setStatus(msg) { statusText.textContent = msg; }
+function rgbToHex(r, g, b) {
+    return '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();
 }
 
-// 初始化光标
-canvas.style.cursor = 'crosshair';
+// 初始化
+setMode('pick');
 </script>
-
 </body>
 </html>
