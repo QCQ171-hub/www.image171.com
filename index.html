@@ -191,8 +191,8 @@ const brushSizeVal   = document.getElementById('brushSizeVal');
 
 // ========== 状态 ==========
 let originalImageData = null;
-let currentMode   = 'pick';  // 'pick' | 'wand' | 'brush'
-let currentAction = 'erase'; // 'erase' | 'restore'
+let currentMode   = 'pick';
+let currentAction = 'erase';
 let isPainting    = false;
 let lastBrushPos  = null;
 
@@ -229,7 +229,6 @@ function setMode(mode) {
     wandGroup.classList.toggle('hidden',  mode !== 'wand');
     brushGroup.classList.toggle('hidden', mode !== 'brush');
 
-    // 选色模式不需要擦除/恢复切换
     actionToggle.classList.toggle('hidden', mode === 'pick');
 
     canvas.style.cursor = mode === 'brush' ? 'none' : 'crosshair';
@@ -252,19 +251,18 @@ actionEraseBtn.addEventListener('click', () => {
     currentAction = 'erase';
     actionEraseBtn.classList.add('erase-active');
     actionRestoreBtn.classList.remove('restore-active');
-    setStatus(`当前动作：擦除（变透明）`);
+    setStatus('当前动作：擦除（变透明）');
 });
 actionRestoreBtn.addEventListener('click', () => {
     currentAction = 'restore';
     actionRestoreBtn.classList.add('restore-active');
     actionEraseBtn.classList.remove('erase-active');
-    setStatus(`当前动作：恢复（还原像素）`);
+    setStatus('当前动作：恢复（还原像素）');
 });
 
 // ========== 4. 滑块 ==========
 pickThreshold.addEventListener('input', (e) => {
     pickThresholdVal.textContent = e.target.value;
-    // 选色模式下实时预览
     if (currentMode === 'pick' && originalImageData && lastPickedColor) {
         clearTimeout(window._pickDebounce);
         window._pickDebounce = setTimeout(() => applyPickColor(lastPickedColor), 30);
@@ -283,24 +281,20 @@ function canvasCoords(e) {
 }
 
 // ================================================================
-//  🎯 选色模式：点选颜色 → 全局匹配替换透明
+//  🎯 选色模式
 // ================================================================
-let lastPickedColor = null; // {r,g,b}
+let lastPickedColor = null;
 
 canvas.addEventListener('click', (e) => {
-    if (!originalImageData) return;
-    if (currentMode !== 'pick') return;
-
+    if (!originalImageData || currentMode !== 'pick') return;
     const { x, y } = canvasCoords(e);
     const w = canvas.width, h = canvas.height;
     if (x < 0 || y < 0 || x >= w || y >= h) return;
 
-    // 从原始数据取色（避免已被透明的像素干扰）
     const origData = originalImageData.data;
     const idx = (y * w + x) * 4;
     lastPickedColor = { r: origData[idx], g: origData[idx+1], b: origData[idx+2] };
 
-    // 更新 UI
     const hex = rgbToHex(lastPickedColor.r, lastPickedColor.g, lastPickedColor.b);
     pickedHex.textContent = hex;
     pickedSwatch.style.backgroundColor = hex;
@@ -309,16 +303,11 @@ canvas.addEventListener('click', (e) => {
     applyPickColor(lastPickedColor);
 });
 
-/**
- * 核心：遍历全部像素，与目标颜色三通道差值均 ≤ 阈值 → 变透明
- * 始终基于 originalImageData 计算，保证可反复调整阈值
- */
 function applyPickColor(color) {
     if (!originalImageData || !color) return;
     const threshold = parseInt(pickThreshold.value);
     const w = canvas.width, h = canvas.height;
 
-    // 先还原原图再处理（这样阈值调小也能正确恢复）
     const imageData = ctx.createImageData(w, h);
     imageData.data.set(originalImageData.data);
     const data = imageData.data;
@@ -336,11 +325,10 @@ function applyPickColor(color) {
 }
 
 // ================================================================
-//  🪄 魔棒模式：BFS 区域生长
+//  🪄 魔棒模式
 // ================================================================
 canvas.addEventListener('click', (e) => {
     if (!originalImageData || currentMode !== 'wand') return;
-
     const { x, y } = canvasCoords(e);
     const w = canvas.width, h = canvas.height;
     if (x < 0 || y < 0 || x >= w || y >= h) return;
@@ -446,38 +434,54 @@ function paintStroke(from, to) {
     ctx.putImageData(imageData, 0, 0);
 }
 
-// ---- 画笔光标 ----
+// ---- ✅ 修复：画笔光标使用 fixed 定位，直接跟随视口鼠标坐标 ----
 let cursorCanvas = null;
+
 function ensureCursorCanvas() {
     if (!cursorCanvas) {
         cursorCanvas = document.createElement('canvas');
-        cursorCanvas.style.cssText = 'position:absolute;pointer-events:none;z-index:10;';
-        canvasWrapper.style.position = 'relative';
-        canvasWrapper.appendChild(cursorCanvas);
+        // fixed 定位：脱离所有父容器滚动/布局影响，直接锚定视口
+        cursorCanvas.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;';
+        document.body.appendChild(cursorCanvas);
     }
 }
+
 function drawBrushCursor(e) {
     ensureCursorCanvas();
-    const rect = canvas.getBoundingClientRect();
     const size = parseInt(brushSize.value);
+
+    // 计算光标在屏幕上的实际显示直径
+    // canvas 可能被 CSS max-width 缩放，需要按实际渲染比例换算
+    const rect = canvas.getBoundingClientRect();
     const displayScale = rect.width / canvas.width;
-    const displaySize = Math.max(size * displayScale, 4);
-    cursorCanvas.width  = displaySize + 4;
-    cursorCanvas.height = displaySize + 4;
-    cursorCanvas.style.width  = cursorCanvas.width + 'px';
-    cursorCanvas.style.height = cursorCanvas.height + 'px';
-    cursorCanvas.style.left   = (e.clientX - rect.left + canvasWrapper.scrollLeft - cursorCanvas.width/2) + 'px';
-    cursorCanvas.style.top    = (e.clientY - rect.top  + canvasWrapper.scrollTop  - cursorCanvas.height/2) + 'px';
+    const displayDiameter = Math.max(size * displayScale, 4);
+
+    // cursorCanvas 自身尺寸 = 显示直径 + 描边余量
+    const pad = 4;
+    const cw = displayDiameter + pad;
+    const ch = displayDiameter + pad;
+    cursorCanvas.width  = cw;
+    cursorCanvas.height = ch;
+    cursorCanvas.style.width  = cw + 'px';
+    cursorCanvas.style.height = ch + 'px';
+
+    // ✅ 核心修复：直接用 e.clientX/Y 居中定位，无需任何 scroll 补偿
+    cursorCanvas.style.left = (e.clientX - cw / 2) + 'px';
+    cursorCanvas.style.top  = (e.clientY - ch / 2) + 'px';
+
     const cctx = cursorCanvas.getContext('2d');
-    cctx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+    cctx.clearRect(0, 0, cw, ch);
     cctx.strokeStyle = currentAction === 'erase' ? '#ef4444' : '#22c55e';
     cctx.lineWidth = 1.5;
     cctx.beginPath();
-    cctx.arc(cursorCanvas.width/2, cursorCanvas.height/2, displaySize/2, 0, Math.PI*2);
+    cctx.arc(cw / 2, ch / 2, displayDiameter / 2, 0, Math.PI * 2);
     cctx.stroke();
 }
+
 function hideBrushCursor() {
-    if (cursorCanvas) cursorCanvas.getContext('2d').clearRect(0,0,cursorCanvas.width,cursorCanvas.height);
+    if (cursorCanvas) {
+        cursorCanvas.style.left = '-9999px';
+    }
 }
 
 // ========== 重置 & 下载 ==========
